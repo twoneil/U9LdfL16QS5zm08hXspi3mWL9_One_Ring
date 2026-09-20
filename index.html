@@ -4,66 +4,423 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Kitco Media — One Ring</title>
-<meta name="description" content="Kitco Media internal reference hub.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/site.css">
+<style>
+:root{
+  --bg:#FFFFFF;
+  --ink:#15171A;
+  --ink-soft:#5B6270;
+  --line:#E7E9EE;
+
+  --navy:#173B7A;
+  --blue:#2F80ED;
+  --orange:#F0A64D;
+  --purple:#8E3FAE;
+  --coral:#E2645B;
+  --gold:#C99A3B;
+  --green:#34C759;
+  --cyan:#3FC1D6;
+  --magenta:#DD4FC0;
+
+  --tile-black:#17181A;
+  --tile-grey:#3A3A3D;
+  --tile-beige:#EEEAE2;
+
+  box-sizing:border-box;
+}
+*{box-sizing:inherit; margin:0; padding:0;}
+html,body{background:var(--bg);}
+body{
+  color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  min-height:100%;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  -webkit-font-smoothing:antialiased;
+}
+a{color:inherit; text-decoration:none;}
+img,svg{display:block;}
+
+.wrap{max-width:520px; margin:0 auto; padding:18px 18px 56px;}
+
+.screen{display:none;}
+.screen.active{display:block;}
+
+/* top bar */
+.topbar{display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:22px;}
+.lockup{display:flex; align-items:baseline; gap:7px; flex-shrink:0;}
+.lockup .kitco{font-weight:700; font-size:19px; letter-spacing:-0.01em; color:var(--ink);}
+.lockup .media-badge{font-weight:600; font-size:11px; letter-spacing:0.08em; color:#fff; background:var(--navy); padding:3px 7px 2px; border-radius:4px; transform:translateY(-1px);}
+
+.util-row{display:flex; gap:10px; flex-shrink:0;}
+.util-btn{width:42px; height:42px; border-radius:22%; display:flex; align-items:center; justify-content:center; flex-shrink:0; box-shadow:0 1px 2px rgba(0,0,0,0.12); border:none; cursor:pointer;}
+.util-btn svg{width:22px; height:22px;}
+.util-home{background:var(--blue);}
+.util-help{background:var(--orange); font-weight:700; color:#fff; font-size:19px;}
+
+/* page head */
+.page-head{display:flex; align-items:center; gap:14px; margin-bottom:26px;}
+.page-icon{width:64px; height:64px; border-radius:22%; flex-shrink:0; display:flex; align-items:center; justify-content:center; box-shadow:0 1px 3px rgba(0,0,0,0.15);}
+.page-icon svg{width:34px; height:34px;}
+.page-head h1{font-weight:700; font-size:26px; letter-spacing:-0.01em; color:var(--ink);}
+
+/* hero */
+.hero{margin-bottom:26px;}
+.hero h1{font-weight:700; font-size:clamp(36px,10vw,46px); line-height:1; letter-spacing:-0.02em; color:var(--navy);}
+.hero p{margin-top:8px; font-size:14.5px; color:var(--ink-soft); max-width:32ch; line-height:1.5;}
+
+.section-label{font-size:12px; font-weight:600; color:var(--ink-soft); margin-bottom:12px;}
+
+/* grid */
+.grid{display:grid; grid-template-columns:repeat(4,1fr); gap:16px 12px;}
+@media (min-width:480px){.grid{gap:20px 16px;}}
+
+.tile-link{display:flex; flex-direction:column; align-items:center; text-align:center; gap:8px; background:none; border:none; cursor:pointer; font:inherit; color:inherit; padding:0;}
+.tile{width:100%; aspect-ratio:1; border-radius:22%; display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden; box-shadow:0 1px 3px rgba(0,0,0,0.16); transition:transform .12s ease;}
+.tile-link:active .tile{transform:scale(0.93);}
+.tile svg{width:58%; height:58%;}
+.tile-label{font-size:11.5px; font-weight:600; color:var(--ink); line-height:1.25;}
+
+.bg-black{background:var(--tile-black);}
+.bg-grey{background:var(--tile-grey);}
+.bg-beige{background:var(--tile-beige);}
+.bg-blue{background:var(--blue);}
+.bg-purple{background:var(--purple);}
+.bg-coral{background:var(--coral);}
+.bg-soon{background:#F0F1F3; border:1.5px dashed #C7CBD3;}
+.tile-link.soon{pointer-events:none;}
+.tile-link.soon .tile-label{color:#A7ADB8;}
+
+.mini-badge{position:absolute; font-weight:700; font-size:8.5px; letter-spacing:0.02em; padding:2px 5px; border-radius:3px; color:#fff;}
+.mini-word{position:absolute; top:22%; font-weight:700; font-size:13px; color:#fff; letter-spacing:-0.02em;}
+.mini-check{position:absolute; bottom:8%; right:8%; width:22%; height:22%; border-radius:50%; background:var(--green); display:flex; align-items:center; justify-content:center;}
+.mini-check svg{width:65%; height:65%;}
+
+.logo-text{font-weight:700; font-size:13px; line-height:1.15; text-align:center;}
+.logo-text .l1{display:block; font-size:9px; font-weight:600; letter-spacing:0.02em;}
+
+footer.page-footer{margin-top:36px; padding-top:14px; border-top:1px solid var(--line); display:flex; justify-content:space-between; font-size:11.5px; color:var(--ink-soft);}
+
+:focus-visible{outline:2px solid var(--blue); outline-offset:2px;}
+</style>
 </head>
 <body>
-<div class="wrap">
 
-  <div class="topbar">
-    <div class="lockup">
-      <span class="kitco">KITCO</span>
-      <span class="media-badge">MEDIA</span>
+<!-- ============ HOME ============ -->
+<section id="screen-home" class="screen active">
+  <div class="wrap">
+    <div class="topbar">
+      <div class="lockup"><span class="kitco">KITCO</span><span class="media-badge">MEDIA</span></div>
+      <div class="util-row">
+        <button class="util-btn util-help" onclick="showScreen('help')" aria-label="Help">?</button>
+      </div>
     </div>
-    <div class="util-row">
-      <a class="util-btn util-help" href="help.html" aria-label="Help">?</a>
+
+    <div class="hero">
+      <h1>One&nbsp;Ring</h1>
+      <p>One page to rule them all. Every workflow the production team needs, in one place.</p>
     </div>
+
+    <p class="section-label">Sections</p>
+
+    <div class="grid">
+      <button class="tile-link" onclick="showScreen('interviews')">
+        <div class="tile bg-blue">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="7.2" r="3.4" fill="#fff"/><path d="M6 15.2c0-2.4 2.6-3.6 6-3.6s6 1.2 6 3.6v1.2H6Z" fill="#fff"/><rect x="4" y="17.4" width="16" height="2.4" rx="1" fill="#fff"/></svg>
+        </div>
+        <span class="tile-label">Interviews</span>
+      </button>
+
+      <button class="tile-link" onclick="showScreen('conference')">
+        <div class="tile bg-black">
+          <svg viewBox="0 0 24 24">
+            <defs><linearGradient id="hg1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8E3FAE"/><stop offset="1" stop-color="#E2645B"/></linearGradient></defs>
+            <path d="M3 5h11v7H9l-3.2 3V12H3Z" fill="url(#hg1)"/>
+            <path d="M11 10h10v7h-2.8v3L15 17h-4Z" fill="url(#hg1)" opacity="0.85"/>
+          </svg>
+        </div>
+        <span class="tile-label">Conference</span>
+      </button>
+
+      <button class="tile-link" onclick="showScreen('sponsor')">
+        <div class="tile bg-purple">
+          <svg viewBox="0 0 24 24">
+            <path d="M13 6.2l7-3.2v14l-7-3.2z" fill="#E8B84B"/>
+            <rect x="11.2" y="7" width="2.2" height="4.6" fill="#E8B84B"/>
+            <circle cx="8.4" cy="15.2" r="5" fill="#3FCB6B"/>
+            <text x="8.4" y="17.4" font-size="6.6" font-weight="700" fill="#fff" text-anchor="middle">$</text>
+          </svg>
+        </div>
+        <span class="tile-label">Sponsor</span>
+      </button>
+
+      <button class="tile-link" onclick="showScreen('videoprod')">
+        <div class="tile bg-coral">
+          <svg viewBox="0 0 24 24">
+            <rect x="3" y="3" width="14" height="14" rx="4" fill="#fff"/>
+            <path d="M8 7.5v6l5-3z" fill="#E2645B"/>
+            <path d="M16.2 14.2l5 5" stroke="#fff" stroke-width="2.3" stroke-linecap="round"/>
+            <path d="M19.6 12.6l3 3-2 2-3-3z" fill="#fff"/>
+          </svg>
+        </div>
+        <span class="tile-label">Video production</span>
+      </button>
+
+      <div class="tile-link soon">
+        <div class="tile bg-soon"><span style="font-weight:700; font-size:28px; color:#C7CBD3;">?</span></div>
+        <span class="tile-label">Soon</span>
+      </div>
+    </div>
+
+    <footer class="page-footer"><span>Kitco Media</span><span>build 26.09.20</span></footer>
   </div>
+</section>
 
-  <div class="hero">
-    <h1>One&nbsp;Ring</h1>
-    <p>One page to rule them all. Every workflow the production team needs, in one place.</p>
-  </div>
+<!-- ============ INTERVIEWS ============ -->
+<section id="screen-interviews" class="screen">
+  <div class="wrap">
+    <div class="topbar">
+      <div class="lockup"><span class="kitco">KITCO</span><span class="media-badge">MEDIA</span></div>
+      <div class="util-row">
+        <button class="util-btn util-home" onclick="showScreen('home')" aria-label="Home"><svg viewBox="0 0 24 24"><path d="M4 11.2 12 4l8 7.2V20h-6v-6h-4v6H4Z" fill="#fff"/></svg></button>
+        <button class="util-btn util-help" onclick="showScreen('help')" aria-label="Help">?</button>
+      </div>
+    </div>
 
-  <p class="section-label">Sections</p>
-
-  <div class="grid">
-
-    <a class="tile-link" href="interviews.html">
-      <div class="tile bg-blue">
+    <div class="page-head">
+      <div class="page-icon bg-blue">
         <svg viewBox="0 0 24 24"><circle cx="12" cy="7.2" r="3.4" fill="#fff"/><path d="M6 15.2c0-2.4 2.6-3.6 6-3.6s6 1.2 6 3.6v1.2H6Z" fill="#fff"/><rect x="4" y="17.4" width="16" height="2.4" rx="1" fill="#fff"/></svg>
       </div>
-      <span class="tile-label">Interviews</span>
-    </a>
+      <h1>Interviews</h1>
+    </div>
 
-    <a class="tile-link" href="conference.html">
-      <div class="tile bg-black">
+    <div class="grid">
+      <a class="tile-link" href="javascript:void(0)">
+        <div class="tile bg-black">
+          <span class="mini-word">KITCO</span>
+          <span class="mini-badge" style="background:#2F6FCE; top:54%;">NEWS</span>
+          <span class="mini-check"><svg viewBox="0 0 24 24"><path d="M5 13l4 4 10-10" stroke="#fff" stroke-width="3.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </div>
+        <span class="tile-label">News<br>checklist</span>
+      </a>
+
+      <a class="tile-link" href="javascript:void(0)">
+        <div class="tile bg-black">
+          <span class="mini-word">KITCO</span>
+          <span class="mini-badge" style="background:var(--gold); top:54%;">MINING</span>
+          <span class="mini-check"><svg viewBox="0 0 24 24"><path d="M5 13l4 4 10-10" stroke="#fff" stroke-width="3.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </div>
+        <span class="tile-label">Mining<br>checklist</span>
+      </a>
+
+      <a class="tile-link" href="javascript:void(0)">
+        <div class="tile bg-grey"><svg viewBox="0 0 24 24"><path d="M3 17l4-5 4 3 5-7 5 4v6H3z" fill="#8FD0F0"/><path d="M3 17h18" stroke="#fff" stroke-width="1"/></svg></div>
+        <span class="tile-label">Chart guide</span>
+      </a>
+
+      <a class="tile-link" href="javascript:void(0)">
+        <div class="tile bg-grey">
+          <svg viewBox="0 0 24 24"><path d="M4 9l8-5 8 5-8 5z" fill="#fff"/><path d="M4 9v5l8 5 8-5V9l-8 5z" fill="#fff" opacity="0.55"/></svg>
+          <span class="mini-badge" style="background:#2F6FCE; bottom:9%; top:auto;">NEWS</span>
+        </div>
+        <span class="tile-label">Dropbox<br>news</span>
+      </a>
+
+      <a class="tile-link" href="javascript:void(0)">
+        <div class="tile bg-coral">
+          <svg viewBox="0 0 24 24">
+            <rect x="2" y="8.6" width="16" height="6.8" rx="3.4" fill="#fff"/>
+            <text x="10" y="13.4" font-size="4.6" font-weight="700" fill="#E2645B" text-anchor="middle">Booking</text>
+            <circle cx="19" cy="17" r="1.3" fill="#fff"/>
+            <circle cx="19" cy="17" r="3" fill="none" stroke="#fff" stroke-width="1" opacity="0.7"/>
+          </svg>
+        </div>
+        <span class="tile-label">Booking</span>
+      </a>
+
+      <a class="tile-link" href="javascript:void(0)">
+        <div class="tile bg-black">
+          <svg viewBox="0 0 24 24">
+            <circle cx="6" cy="7" r="1.8" fill="#fff"/><rect x="9" y="6.2" width="10" height="1.6" rx="0.8" fill="#fff"/>
+            <circle cx="6" cy="12" r="1.8" fill="#fff"/><rect x="9" y="11.2" width="10" height="1.6" rx="0.8" fill="#fff"/>
+            <circle cx="6" cy="17" r="1.8" fill="#fff"/><rect x="9" y="16.2" width="10" height="1.6" rx="0.8" fill="#fff"/>
+          </svg>
+        </div>
+        <span class="tile-label">Contacts /<br>archive</span>
+      </a>
+
+      <a class="tile-link" href="javascript:void(0)">
+        <div class="tile bg-grey">
+          <svg viewBox="0 0 24 24">
+            <defs><radialGradient id="ig1" cx="30%" cy="30%" r="80%"><stop offset="0" stop-color="#F5C24D"/><stop offset="0.5" stop-color="#E2445B"/><stop offset="1" stop-color="#8E3FAE"/></radialGradient></defs>
+            <rect x="6" y="2" width="12" height="20" rx="3" fill="none" stroke="#fff" stroke-width="1.5"/>
+            <circle cx="12" cy="12" r="4" fill="url(#ig1)"/>
+            <circle cx="12" cy="12" r="1.5" fill="#fff"/>
+          </svg>
+        </div>
+        <span class="tile-label">Socials</span>
+      </a>
+
+      <a class="tile-link" href="javascript:void(0)">
+        <div class="tile bg-grey">
+          <svg viewBox="0 0 24 24"><path d="M4 9l8-5 8 5-8 5z" fill="#fff"/><path d="M4 9v5l8 5 8-5V9l-8 5z" fill="#fff" opacity="0.55"/></svg>
+          <span class="mini-badge" style="background:var(--gold); bottom:9%; top:auto;">MINING</span>
+        </div>
+        <span class="tile-label">Dropbox<br>mining</span>
+      </a>
+    </div>
+
+    <footer class="page-footer"><span>Kitco Media</span><span>Interviews</span></footer>
+  </div>
+</section>
+
+<!-- ============ CONFERENCE ============ -->
+<section id="screen-conference" class="screen">
+  <div class="wrap">
+    <div class="topbar">
+      <div class="lockup"><span class="kitco">KITCO</span><span class="media-badge">MEDIA</span></div>
+      <div class="util-row">
+        <button class="util-btn util-home" onclick="showScreen('home')" aria-label="Home"><svg viewBox="0 0 24 24"><path d="M4 11.2 12 4l8 7.2V20h-6v-6h-4v6H4Z" fill="#fff"/></svg></button>
+        <button class="util-btn util-help" onclick="showScreen('help')" aria-label="Help">?</button>
+      </div>
+    </div>
+
+    <div class="page-head">
+      <div class="page-icon bg-black">
         <svg viewBox="0 0 24 24">
-          <defs><linearGradient id="hg1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8E3FAE"/><stop offset="1" stop-color="#E2645B"/></linearGradient></defs>
-          <path d="M3 5h11v7H9l-3.2 3V12H3Z" fill="url(#hg1)"/>
-          <path d="M11 10h10v7h-2.8v3L15 17h-4Z" fill="url(#hg1)" opacity="0.85"/>
+          <defs><linearGradient id="pg1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8E3FAE"/><stop offset="1" stop-color="#E2645B"/></linearGradient></defs>
+          <path d="M3 5h11v7H9l-3.2 3V12H3Z" fill="url(#pg1)"/>
+          <path d="M11 10h10v7h-2.8v3L15 17h-4Z" fill="url(#pg1)" opacity="0.85"/>
         </svg>
       </div>
-      <span class="tile-label">Conference</span>
-    </a>
+      <h1>Conference</h1>
+    </div>
 
-    <a class="tile-link" href="sponsor.html">
-      <div class="tile bg-purple">
+    <div class="grid">
+      <a class="tile-link" href="javascript:void(0)">
+        <div class="tile bg-black"><svg viewBox="0 0 24 24"><path d="M12 3l2.6 5.3 5.8.8-4.2 4.1 1 5.8L12 16.9 6.8 19l1-5.8-4.2-4.1 5.8-.8z" fill="#F0C24D"/></svg></div>
+        <span class="tile-label">Master of<br>conferences</span>
+      </a>
+
+      <a class="tile-link" href="javascript:void(0)">
+        <div class="tile bg-grey">
+          <svg viewBox="0 0 24 24">
+            <rect x="9" y="9" width="6" height="1.6" rx="0.8" fill="#B9A8F0"/>
+            <rect x="11.2" y="10.6" width="1.6" height="6" fill="#B9A8F0"/>
+            <path d="M4 9l3-2 3 2-1 3H5z" fill="#7C6FE0"/>
+            <path d="M14 9l3-2 3 2-1 3h-4z" fill="#7C6FE0"/>
+          </svg>
+        </div>
+        <span class="tile-label">Furniture<br>guide</span>
+      </a>
+
+      <a class="tile-link" href="javascript:void(0)">
+        <div class="tile bg-grey">
+          <svg viewBox="0 0 24 24">
+            <rect x="5" y="4" width="14" height="16" rx="2" fill="#EFE9DA"/>
+            <rect x="7.5" y="8" width="9" height="1.4" rx="0.7" fill="#E2645B"/>
+            <rect x="7.5" y="11" width="9" height="1.4" rx="0.7" fill="#E8B84B"/>
+            <rect x="7.5" y="14" width="6" height="1.4" rx="0.7" fill="#E8B84B"/>
+          </svg>
+        </div>
+        <span class="tile-label">Promo<br>storyboard</span>
+      </a>
+
+      <a class="tile-link" href="javascript:void(0)">
+        <div class="tile bg-grey">
+          <span class="logo-text" style="color:var(--cyan); font-style:italic;"><span class="l1" style="color:var(--cyan);">Conference</span>Logos</span>
+        </div>
+        <span class="tile-label">Conference<br>logos</span>
+      </a>
+    </div>
+
+    <footer class="page-footer"><span>Kitco Media</span><span>Conference</span></footer>
+  </div>
+</section>
+
+<!-- ============ SPONSOR ============ -->
+<section id="screen-sponsor" class="screen">
+  <div class="wrap">
+    <div class="topbar">
+      <div class="lockup"><span class="kitco">KITCO</span><span class="media-badge">MEDIA</span></div>
+      <div class="util-row">
+        <button class="util-btn util-home" onclick="showScreen('home')" aria-label="Home"><svg viewBox="0 0 24 24"><path d="M4 11.2 12 4l8 7.2V20h-6v-6h-4v6H4Z" fill="#fff"/></svg></button>
+        <button class="util-btn util-help" onclick="showScreen('help')" aria-label="Help">?</button>
+      </div>
+    </div>
+
+    <div class="page-head">
+      <div class="page-icon bg-purple">
         <svg viewBox="0 0 24 24">
           <path d="M13 6.2l7-3.2v14l-7-3.2z" fill="#E8B84B"/>
           <rect x="11.2" y="7" width="2.2" height="4.6" fill="#E8B84B"/>
           <circle cx="8.4" cy="15.2" r="5" fill="#3FCB6B"/>
-          <text x="8.4" y="17.4" font-size="6.6" font-weight="700" fill="#fff" text-anchor="middle" font-family="Inter, sans-serif">$</text>
+          <text x="8.4" y="17.4" font-size="6.6" font-weight="700" fill="#fff" text-anchor="middle">$</text>
         </svg>
       </div>
-      <span class="tile-label">Sponsor</span>
-    </a>
+      <h1>Sponsor</h1>
+    </div>
 
-    <a class="tile-link" href="videoprod.html">
-      <div class="tile bg-coral">
+    <div class="grid">
+      <a class="tile-link" href="javascript:void(0)">
+        <div class="tile bg-grey">
+          <span class="logo-text" style="color:var(--magenta); font-style:italic;"><span class="l1" style="color:var(--magenta);">Sponsor</span>Logos</span>
+        </div>
+        <span class="tile-label">Sponsor<br>logos</span>
+      </a>
+
+      <a class="tile-link" href="javascript:void(0)">
+        <div class="tile bg-grey">
+          <svg viewBox="0 0 24 24">
+            <rect x="5" y="3" width="12" height="17" rx="2" fill="none" stroke="#5AA9F5" stroke-width="1.5"/>
+            <rect x="8.5" y="1.6" width="5" height="2.4" rx="1" fill="#5AA9F5"/>
+            <path d="M7.5 8l1.3 1.3L11 7" stroke="#5AA9F5" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <rect x="12" y="7.4" width="3.5" height="1.2" rx="0.6" fill="#5AA9F5"/>
+            <path d="M7.5 12.5l1.3 1.3 2.2-2.3" stroke="#5AA9F5" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <rect x="12" y="11.9" width="3.5" height="1.2" rx="0.6" fill="#5AA9F5"/>
+            <circle cx="17" cy="18" r="4.2" fill="#3E77E0"/>
+            <text x="17" y="19.6" font-size="5" font-weight="700" fill="#fff" text-anchor="middle">$</text>
+          </svg>
+        </div>
+        <span class="tile-label">Guide —<br>daily shows</span>
+      </a>
+
+      <a class="tile-link" href="javascript:void(0)">
+        <div class="tile bg-beige">
+          <svg viewBox="0 0 24 24">
+            <rect x="4" y="4" width="16" height="16" rx="2" fill="#fff" stroke="#D8D2C4"/>
+            <rect x="6" y="7" width="12" height="1.2" fill="#3A3A3D" opacity="0.45"/>
+            <rect x="6" y="10" width="12" height="1.2" fill="#3A3A3D" opacity="0.45"/>
+            <rect x="6" y="13" width="8" height="1.2" fill="#3A3A3D" opacity="0.45"/>
+            <circle cx="17" cy="16.4" r="4" fill="none" stroke="#C99A3B" stroke-width="1.6"/>
+            <text x="17" y="18" font-size="4.6" font-weight="700" fill="#C99A3B" text-anchor="middle">AD</text>
+          </svg>
+        </div>
+        <span class="tile-label">Ad option<br>on video</span>
+      </a>
+
+      <div class="tile-link soon">
+        <div class="tile bg-soon"><span style="font-weight:700; font-size:28px; color:#C7CBD3;">?</span></div>
+        <span class="tile-label">Soon</span>
+      </div>
+    </div>
+
+    <footer class="page-footer"><span>Kitco Media</span><span>Sponsor</span></footer>
+  </div>
+</section>
+
+<!-- ============ VIDEO PRODUCTION ============ -->
+<section id="screen-videoprod" class="screen">
+  <div class="wrap">
+    <div class="topbar">
+      <div class="lockup"><span class="kitco">KITCO</span><span class="media-badge">MEDIA</span></div>
+      <div class="util-row">
+        <button class="util-btn util-home" onclick="showScreen('home')" aria-label="Home"><svg viewBox="0 0 24 24"><path d="M4 11.2 12 4l8 7.2V20h-6v-6h-4v6H4Z" fill="#fff"/></svg></button>
+        <button class="util-btn util-help" onclick="showScreen('help')" aria-label="Help">?</button>
+      </div>
+    </div>
+
+    <div class="page-head">
+      <div class="page-icon bg-coral">
         <svg viewBox="0 0 24 24">
           <rect x="3" y="3" width="14" height="14" rx="4" fill="#fff"/>
           <path d="M8 7.5v6l5-3z" fill="#E2645B"/>
@@ -71,23 +428,99 @@
           <path d="M19.6 12.6l3 3-2 2-3-3z" fill="#fff"/>
         </svg>
       </div>
-      <span class="tile-label">Video production</span>
-    </a>
-
-    <div class="tile-link soon">
-      <div class="tile bg-soon">
-        <span style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:28px; color:#C7CBD3;">?</span>
-      </div>
-      <span class="tile-label">Soon</span>
+      <h1>Video production</h1>
     </div>
 
+    <div class="grid">
+      <a class="tile-link" href="javascript:void(0)">
+        <div class="tile bg-black">
+          <svg viewBox="0 0 24 24">
+            <rect x="5" y="3" width="14" height="18" rx="2" fill="#F3DE7B"/>
+            <rect x="8" y="1.6" width="8" height="2.6" rx="1" fill="#C99A3B"/>
+            <rect x="7.5" y="8" width="9" height="1" fill="#8a7530" opacity="0.55"/>
+            <rect x="7.5" y="10.5" width="9" height="1" fill="#8a7530" opacity="0.55"/>
+            <rect x="7.5" y="13" width="6" height="1" fill="#8a7530" opacity="0.55"/>
+          </svg>
+          <span class="mini-check"><svg viewBox="0 0 24 24"><path d="M5 13l4 4 10-10" stroke="#fff" stroke-width="3.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </div>
+        <span class="tile-label">Pre-prod<br>checklist</span>
+      </a>
+
+      <a class="tile-link" href="javascript:void(0)">
+        <div class="tile bg-grey">
+          <svg viewBox="0 0 24 24">
+            <rect x="5" y="3" width="14" height="18" rx="2" fill="#3E77E0"/>
+            <path d="M15 3v4h4z" fill="#8FB4F0"/>
+            <path d="M7.5 10l1.3 1.3 2-2.1" stroke="#fff" stroke-width="1.3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <rect x="11.5" y="9.6" width="4.5" height="1" fill="#fff"/>
+            <path d="M7.5 14l1.3 1.3 2-2.1" stroke="#fff" stroke-width="1.3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <rect x="11.5" y="13.6" width="4.5" height="1" fill="#fff"/>
+          </svg>
+        </div>
+        <span class="tile-label">Postprod<br>checklist</span>
+      </a>
+
+      <a class="tile-link" href="javascript:void(0)">
+        <div class="tile bg-grey">
+          <svg viewBox="0 0 24 24">
+            <defs><linearGradient id="rg1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3FE0A0"/><stop offset="1" stop-color="#34C7C7"/></linearGradient></defs>
+            <circle cx="14" cy="5" r="2.2" fill="url(#rg1)"/>
+            <path d="M9 20l3-6 2 1.5 1-4 4 1.5-1 3-3-1-1.5 3-2 3z" fill="url(#rg1)"/>
+          </svg>
+        </div>
+        <span class="tile-label">Plan of<br>action</span>
+      </a>
+
+      <div class="tile-link soon">
+        <div class="tile bg-soon"><svg viewBox="0 0 24 24"><path d="M3 17l4-4 4 2 5-6 5 3v5H3z" fill="#C9D6E3"/></svg></div>
+        <span class="tile-label">Soon</span>
+      </div>
+    </div>
+
+    <footer class="page-footer"><span>Kitco Media</span><span>Video production</span></footer>
   </div>
+</section>
 
-  <footer class="page-footer">
-    <span>Kitco Media</span>
-    <span>build 26.09.20</span>
-  </footer>
+<!-- ============ HELP ============ -->
+<section id="screen-help" class="screen">
+  <div class="wrap">
+    <div class="topbar">
+      <div class="lockup"><span class="kitco">KITCO</span><span class="media-badge">MEDIA</span></div>
+      <div class="util-row">
+        <button class="util-btn util-home" onclick="showScreen('home')" aria-label="Home"><svg viewBox="0 0 24 24"><path d="M4 11.2 12 4l8 7.2V20h-6v-6h-4v6H4Z" fill="#fff"/></svg></button>
+      </div>
+    </div>
 
-</div>
+    <div class="hero">
+      <h1>Help</h1>
+      <p>Something missing, broken, or out of date? Note it here so it can be fixed.</p>
+    </div>
+
+    <p class="section-label">Getting around</p>
+    <p style="font-size:14px; color:var(--ink-soft); line-height:1.6; max-width:36ch;">
+      Tap the blue home icon on any page to get back to One Ring. Each section
+      (Interviews, Conference, Sponsor, Video production) is a grid of shortcuts —
+      tap a tile the way you'd tap an app on your phone.
+    </p>
+
+    <p class="section-label" style="margin-top:26px;">Report an issue</p>
+    <p style="font-size:14px; color:var(--ink-soft); line-height:1.6; max-width:36ch;">
+      Add your contact method or a link to a feedback form here.
+    </p>
+
+    <footer class="page-footer"><span>Kitco Media</span><span>Help</span></footer>
+  </div>
+</section>
+
+<script>
+  function showScreen(name){
+    var screens = document.querySelectorAll('.screen');
+    for (var i=0; i<screens.length; i++){ screens[i].classList.remove('active'); }
+    var el = document.getElementById('screen-' + name);
+    if (el) { el.classList.add('active'); }
+    window.scrollTo(0,0);
+  }
+</script>
+
 </body>
 </html>
